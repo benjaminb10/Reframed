@@ -38,6 +38,7 @@ extension VideoCompositor {
     effectiveTrim: CMTimeRange
   ) throws -> URL? {
     guard config.clickSoundEnabled,
+      !TimeLapse.dropsAudio(speed: config.playbackSpeed),
       let snapshot = cursorSnapshot,
       !snapshot.clicks.isEmpty
     else { return nil }

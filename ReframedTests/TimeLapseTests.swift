@@ -5,6 +5,18 @@ private func seconds(_ value: Double) -> CMTime {
   CMTime(seconds: value, preferredTimescale: 600)
 }
 
+@Test func clampKeepsSpeedInsideSupportedRange() {
+  #expect(TimeLapse.clamp(1) == 1)
+  #expect(TimeLapse.clamp(4) == 4)
+  #expect(TimeLapse.clamp(16) == 16)
+  #expect(TimeLapse.clamp(0.5) == TimeLapse.range.lowerBound)
+  #expect(TimeLapse.clamp(-3) == TimeLapse.range.lowerBound)
+  #expect(TimeLapse.clamp(.nan) == TimeLapse.range.lowerBound)
+  #expect(TimeLapse.clamp(-.infinity) == TimeLapse.range.lowerBound)
+  #expect(TimeLapse.clamp(100) == TimeLapse.range.upperBound)
+  #expect(TimeLapse.clamp(.infinity) == TimeLapse.range.upperBound)
+}
+
 @Test func frameCountScalesInverselyWithSpeed() {
   let duration = seconds(10)
   #expect(TimeLapse.frameCount(duration: duration, fps: 30, speed: 1) == 300)
@@ -24,6 +36,7 @@ private func seconds(_ value: Double) -> CMTime {
   for speed in [0, -1, -0.5, Double.nan] {
     #expect(TimeLapse.frameCount(duration: duration, fps: 30, speed: speed) == atNormalSpeed)
   }
+  #expect(TimeLapse.frameCount(duration: duration, fps: 30, speed: -.infinity) == atNormalSpeed)
   #expect(TimeLapse.frameCount(duration: duration, fps: 30, speed: .infinity) == 19)
   #expect(TimeLapse.frameCount(duration: duration, fps: 30, speed: 1000) == 19)
 }
@@ -59,9 +72,11 @@ private func seconds(_ value: Double) -> CMTime {
 }
 
 @Test func effectiveDurationMatchesExportedLength() {
-  #expect(abs(TimeLapse.effectiveDuration(seconds(600), speed: 8) - 75.0) < 0.0001)
-  #expect(abs(TimeLapse.effectiveDuration(seconds(600), speed: 1) - 600.0) < 0.0001)
-  #expect(TimeLapse.effectiveDuration(.invalid, speed: 4) == 0)
+  #expect(abs(TimeLapse.effectiveDuration(seconds: 600, speed: 8) - 75.0) < 0.0001)
+  #expect(abs(TimeLapse.effectiveDuration(seconds: 600, speed: 1) - 600.0) < 0.0001)
+  #expect(TimeLapse.effectiveDuration(seconds: 0, speed: 4) == 0)
+  #expect(TimeLapse.effectiveDuration(seconds: -5, speed: 4) == 0)
+  #expect(TimeLapse.effectiveDuration(seconds: .nan, speed: 4) == 0)
 }
 
 @Test func audioIsDroppedOnlyAboveNormalSpeed() {

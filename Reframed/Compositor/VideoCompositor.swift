@@ -68,7 +68,7 @@ enum VideoCompositor {
     )
 
     let clickSoundURL = try generateClickSound(
-      cursorSnapshot: dropsAudio ? nil : config.cursorSnapshot,
+      cursorSnapshot: config.cursorSnapshot,
       config: config,
       compositionDuration: compositionDuration,
       videoSegments: videoSegments,

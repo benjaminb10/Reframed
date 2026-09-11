@@ -140,6 +140,13 @@ final class EditorState {
     videoRegions.reduce(0) { $0 + ($1.endSeconds - $1.startSeconds) }
   }
 
+  var exportedSourceDuration: Double {
+    guard !videoRegions.isEmpty else {
+      return max(0, CMTimeGetSeconds(trimEnd) - CMTimeGetSeconds(trimStart))
+    }
+    return videoRegionsTotalDuration
+  }
+
   var hasVideoRegionCuts: Bool {
     let dur = CMTimeGetSeconds(duration)
     guard !videoRegions.isEmpty else { return false }

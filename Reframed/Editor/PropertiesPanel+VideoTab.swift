@@ -122,9 +122,13 @@ extension PropertiesPanel {
   }
 
   private var speedFootnote: String {
-    let exported = TimeLapse.effectiveDuration(editorState.duration, speed: editorState.playbackSpeed)
+    let exported = TimeLapse.effectiveDuration(
+      seconds: editorState.exportedSourceDuration,
+      speed: editorState.playbackSpeed
+    )
     let length = "Exports as \(formatDuration(seconds: Int(exported.rounded())))"
-    guard TimeLapse.dropsAudio(speed: editorState.playbackSpeed) else { return length }
+    let hasAudio = editorState.hasSystemAudio || editorState.hasMicAudio
+    guard hasAudio, TimeLapse.dropsAudio(speed: editorState.playbackSpeed) else { return length }
     return "\(length) · audio removed above 1x"
   }
 }
