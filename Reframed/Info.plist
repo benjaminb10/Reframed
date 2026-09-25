@@ -19,7 +19,7 @@
 	<key>SUPublicEDKey</key>
 	<string>fbTkPksA1K4eUhGRCvIscQ7QGdUy3tstkNtWy/NstdY=</string>
 	<key>SUEnableAutomaticChecks</key>
-	<true/>
+	<false/>
 	<key>NSScreenCaptureUsageDescription</key>
 	<string>Reframed needs screen recording access to capture your screen.</string>
 	<key>NSMicrophoneUsageDescription</key>

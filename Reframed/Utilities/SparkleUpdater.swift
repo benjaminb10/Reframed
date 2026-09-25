@@ -12,7 +12,7 @@ final class SparkleUpdater {
       updaterDelegate: nil,
       userDriverDelegate: nil
     )
-    controller.updater.automaticallyChecksForUpdates = true
+    controller.updater.automaticallyChecksForUpdates = false
     controller.updater.updateCheckInterval = 3600
   }
 
