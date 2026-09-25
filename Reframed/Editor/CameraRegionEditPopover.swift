@@ -150,13 +150,15 @@ struct CameraRegionEditPopover: View {
         }
       }
 
-      SectionHeader(icon: "aspectratio", title: "Aspect Ratio")
+      SectionHeader(icon: "circle.square", title: "Camera Shape")
 
-      SegmentPicker(
-        items: CameraAspect.allCases,
-        label: { $0.label },
-        selection: $localAspect
-      )
+      ForEach(CameraAspect.pickerRows, id: \.self) { row in
+        SegmentPicker(
+          items: row,
+          label: { $0.label },
+          selection: $localAspect
+        )
+      }
 
       SectionHeader(icon: "paintbrush", title: "Style")
 
@@ -171,8 +173,10 @@ struct CameraRegionEditPopover: View {
         label: "Radius",
         value: $localCornerRadius,
         range: 0...50,
-        formattedValue: "\(Int(localCornerRadius))%"
+        formattedValue: localAspect.isCircle ? "Circle" : "\(Int(localCornerRadius))%"
       )
+      .disabled(localAspect.isCircle)
+      .opacity(localAspect.isCircle ? 0.5 : 1)
 
       SliderRow(
         label: "Shadow",

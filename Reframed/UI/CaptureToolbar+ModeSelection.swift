@@ -169,8 +169,10 @@ extension CaptureToolbar {
         .buttonStyle(PlainCustomButtonStyle())
         .hoverEffect(id: "btn.options")
         .popover(isPresented: $showOptions, arrowEdge: .bottom) {
-          OptionsPopover(options: session.options)
-            .presentationBackground(ReframedColors.backgroundPopover)
+          OptionsPopover(options: session.options) {
+            session.updateCameraPreviewShape()
+          }
+          .presentationBackground(ReframedColors.backgroundPopover)
         }
 
         ToolbarDivider()

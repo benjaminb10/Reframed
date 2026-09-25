@@ -160,9 +160,13 @@ extension VideoCompositor {
       },
       cameraCornerRadius: {
         guard let rect = cameraRect else { return 0 }
-        let scaledW = rect.width * scaleX
-        let scaledH = rect.height * scaleY
-        return min(scaledW, scaledH) * (config.cameraCornerRadius / 100.0)
+        let scaledRect = CGRect(
+          x: rect.origin.x * scaleX,
+          y: rect.origin.y * scaleY,
+          width: rect.width * scaleX,
+          height: rect.height * scaleY
+        )
+        return config.cameraAspect.cornerRadius(in: scaledRect, percentage: config.cameraCornerRadius)
       }(),
       cameraBorderWidth: config.cameraBorderWidth * scaleX,
       cameraBorderColor: config.cameraBorderColor.cgColor,

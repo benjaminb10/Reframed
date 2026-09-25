@@ -66,8 +66,8 @@ struct PropertiesPanel: View {
           backgroundSection
         case .camera:
           cameraSection
+          cameraShapeSection
           cameraPositionSection
-          cameraAspectRatioSection
           cameraStyleSection
           cameraBackgroundSection
           cameraFullscreenSection

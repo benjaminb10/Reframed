@@ -55,6 +55,11 @@ final class ConfigService {
     set { data.cameraMaximumResolution = newValue; save() }
   }
 
+  var cameraAspect: CameraAspect {
+    get { CameraAspect(rawValue: data.cameraAspect) ?? .original }
+    set { data.cameraAspect = newValue.rawValue; save() }
+  }
+
   var projectFolder: String {
     get { data.projectFolder }
     set { data.projectFolder = newValue; save() }
@@ -174,6 +179,7 @@ private struct ConfigData: Codable {
   var captureSystemAudio: Bool = false
   var cameraDeviceId: String? = nil
   var cameraMaximumResolution: String = "1080p"
+  var cameraAspect: String = CameraAspect.original.rawValue
   var projectFolder: String = "~/Reframed"
   var retinaCapture: Bool = false
   var dimOuterArea: Bool = true

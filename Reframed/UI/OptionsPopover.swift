@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OptionsPopover: View {
   @Bindable var options: RecordingOptions
+  var onCameraAspectChange: (() -> Void)?
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
@@ -75,6 +76,26 @@ struct OptionsPopover: View {
         }
       }
 
+      if options.selectedCamera != nil {
+        Divider()
+          .background(ReframedColors.divider)
+          .padding(.vertical, 4)
+
+        SectionHeader(title: "Camera Shape")
+
+        VStack(alignment: .leading, spacing: Layout.compactSpacing) {
+          ForEach(CameraAspect.pickerRows, id: \.self) { row in
+            SegmentPicker(
+              items: row,
+              label: { $0.label },
+              selection: $options.cameraAspect
+            )
+          }
+        }
+        .padding(.horizontal, 12)
+        .padding(.bottom, 4)
+      }
+
       Divider()
         .background(ReframedColors.divider)
         .padding(.vertical, 4)
@@ -126,5 +147,8 @@ struct OptionsPopover: View {
     .padding(.vertical, 8)
     .frame(minWidth: 280)
     .popoverContainerStyle()
+    .onChange(of: options.cameraAspect) { _, _ in
+      onCameraAspectChange?()
+    }
   }
 }

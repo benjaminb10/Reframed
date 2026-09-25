@@ -176,8 +176,7 @@ extension VideoPreviewContainer {
           height: pipFrame.height + (fsTargetRect.height - pipFrame.height) * p
         )
 
-        let pipMinDim = min(pipW, pipH)
-        let pipRadius = pipMinDim * (currentCameraCornerRadius / 100.0)
+        let pipRadius = currentCameraAspect.cornerRadius(in: pipFrame, percentage: currentCameraCornerRadius)
         let interpRadius = pipRadius * (1.0 - p)
         let pipBorder = currentCameraBorderWidth * min(scaleX, scaleY)
         let interpBorder = pipBorder * (1.0 - p)
@@ -289,10 +288,8 @@ extension VideoPreviewContainer {
         height: defFrame.height + (customFrame.height - defFrame.height) * p
       )
 
-      let defMinDim = min(defW, defH)
-      let defRadius = defMinDim * (defaultPipCornerRadius / 100.0)
-      let customMinDim = min(w, h)
-      let customRadius = customMinDim * (currentCameraCornerRadius / 100.0)
+      let defRadius = defaultPipCameraAspect.cornerRadius(in: defFrame, percentage: defaultPipCornerRadius)
+      let customRadius = currentCameraAspect.cornerRadius(in: customFrame, percentage: currentCameraCornerRadius)
       let interpRadius = defRadius + (customRadius - defRadius) * p
 
       let defBorder = defaultPipBorderWidth * min(scaleX, scaleY)
@@ -342,11 +339,11 @@ extension VideoPreviewContainer {
       return
     }
 
+    let webcamFrame = CGRect(x: x, y: bounds.height - y - h, width: w, height: h)
     let minDim = min(w, h)
-    let scaledRadius = minDim * (currentCameraCornerRadius / 100.0)
+    let scaledRadius = currentCameraAspect.cornerRadius(in: webcamFrame, percentage: currentCameraCornerRadius)
     let scaledBorder = currentCameraBorderWidth * min(scaleX, scaleY)
 
-    let webcamFrame = CGRect(x: x, y: bounds.height - y - h, width: w, height: h)
     webcamWrapper.frame = webcamFrame
     webcamView.frame = webcamWrapper.bounds
     webcamView.layer?.cornerRadius = scaledRadius

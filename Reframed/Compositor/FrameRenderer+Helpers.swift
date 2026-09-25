@@ -118,11 +118,9 @@ extension FrameRenderer {
         height: pixelRect.height * scaleY
       )
 
-      let minDim = min(scaledRect.width, scaledRect.height)
-
       return ResolvedCamera(
         rect: scaledRect,
-        cornerRadius: minDim * (region.cornerRadius / 100.0),
+        cornerRadius: region.cameraAspect.cornerRadius(in: scaledRect, percentage: region.cornerRadius),
         borderWidth: region.borderWidth * scale,
         borderColor: region.borderColor,
         shadow: region.shadow,

@@ -9,16 +9,31 @@ final class WebcamPreviewWindow {
   nonisolated(unsafe) private var moveObserver: NSObjectProtocol?
   private var appearanceObserver: NSKeyValueObservation?
 
-  private let videoWidth: CGFloat = 270
-  private let videoHeight: CGFloat = 202
-  private let cornerRadius: CGFloat = 60
+  private let baseVideoWidth: CGFloat = 270
+  private let cornerRadiusPercent: CGFloat = 30
+  private var videoWidth: CGFloat = 270
+  private var videoHeight: CGFloat = 202
+  private var cameraAspect: CameraAspect = .original
+  private var webcamSize: CGSize?
+
+  private var cornerRadius: CGFloat {
+    let rect = CGRect(origin: .zero, size: CGSize(width: videoWidth, height: videoHeight))
+    if cameraAspect.isCircle {
+      return cameraAspect.cornerRadius(in: rect, percentage: 50)
+    }
+    return min(videoWidth, videoHeight) * cornerRadiusPercent / 100
+  }
 
   private var totalWidth: CGFloat { videoWidth }
   private var totalHeight: CGFloat { videoHeight }
 
-  func showLoading() {
+  func showLoading(cameraAspect: CameraAspect = ConfigService.shared.cameraAspect, webcamSize: CGSize? = nil) {
+    configureStyle(cameraAspect: cameraAspect, webcamSize: webcamSize)
+
     if panel == nil {
       createPanel()
+    } else {
+      resizePanelForCurrentStyle()
     }
 
     previewLayer?.removeFromSuperlayer()
@@ -26,6 +41,7 @@ final class WebcamPreviewWindow {
     loadingView?.removeFromSuperview()
 
     guard let contentView = panel?.contentView else { return }
+    contentView.subviews.forEach { $0.removeFromSuperview() }
 
     let container = NSView(frame: NSRect(origin: .zero, size: NSSize(width: videoWidth, height: videoHeight)))
     container.wantsLayer = true
@@ -53,15 +69,26 @@ final class WebcamPreviewWindow {
     panel?.orderFrontRegardless()
   }
 
-  func show(captureSession: AVCaptureSession) {
+  func show(
+    captureSession: AVCaptureSession,
+    cameraAspect: CameraAspect = ConfigService.shared.cameraAspect,
+    webcamSize: CGSize? = nil
+  ) {
+    configureStyle(cameraAspect: cameraAspect, webcamSize: webcamSize)
+
     if panel == nil {
       createPanel()
+    } else {
+      resizePanelForCurrentStyle()
     }
 
     previewLayer?.removeFromSuperlayer()
     previewLayer = nil
 
     guard let contentView = panel?.contentView else { return }
+    contentView.subviews
+      .filter { $0 !== loadingView }
+      .forEach { $0.removeFromSuperview() }
 
     let videoView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: videoWidth, height: videoHeight)))
     videoView.wantsLayer = true
@@ -85,9 +112,13 @@ final class WebcamPreviewWindow {
     }
   }
 
-  func showError(_ message: String) {
+  func showError(_ message: String, cameraAspect: CameraAspect = ConfigService.shared.cameraAspect, webcamSize: CGSize? = nil) {
+    configureStyle(cameraAspect: cameraAspect, webcamSize: webcamSize)
+
     if panel == nil {
       createPanel()
+    } else {
+      resizePanelForCurrentStyle()
     }
 
     previewLayer?.removeFromSuperlayer()
@@ -96,6 +127,7 @@ final class WebcamPreviewWindow {
     loadingView = nil
 
     guard let contentView = panel?.contentView else { return }
+    contentView.subviews.forEach { $0.removeFromSuperview() }
 
     let container = NSView(frame: NSRect(origin: .zero, size: NSSize(width: videoWidth, height: videoHeight)))
     container.wantsLayer = true
@@ -120,6 +152,11 @@ final class WebcamPreviewWindow {
     loadingView = container
 
     panel?.orderFrontRegardless()
+  }
+
+  func updateStyle(cameraAspect: CameraAspect, webcamSize: CGSize? = nil) {
+    configureStyle(cameraAspect: cameraAspect, webcamSize: webcamSize)
+    resizePanelForCurrentStyle()
   }
 
   func hide() {
@@ -188,6 +225,37 @@ final class WebcamPreviewWindow {
         self?.updateColors()
       }
     }
+  }
+
+  private func configureStyle(cameraAspect: CameraAspect, webcamSize: CGSize?) {
+    self.cameraAspect = cameraAspect
+    if let webcamSize {
+      self.webcamSize = webcamSize
+    }
+
+    let sourceSize = self.webcamSize ?? CGSize(width: 4, height: 3)
+    let ratio = cameraAspect.heightToWidthRatio(webcamSize: sourceSize)
+    videoWidth = baseVideoWidth
+    videoHeight = round(videoWidth * ratio)
+  }
+
+  private func resizePanelForCurrentStyle() {
+    guard let panel else { return }
+    let newSize = NSSize(width: totalWidth, height: totalHeight)
+    let oldFrame = panel.frame
+    let origin = CGPoint(x: oldFrame.maxX - newSize.width, y: oldFrame.origin.y)
+    panel.setFrame(NSRect(origin: origin, size: newSize), display: true)
+
+    guard let contentView = panel.contentView else { return }
+    contentView.frame = NSRect(origin: .zero, size: newSize)
+    contentView.layer?.cornerRadius = cornerRadius
+
+    for subview in contentView.subviews {
+      subview.frame = contentView.bounds
+      subview.layer?.cornerRadius = cornerRadius
+    }
+
+    previewLayer?.frame = contentView.bounds
   }
 
   private func updateColors() {

@@ -238,6 +238,7 @@ final class EditorState {
     self.result = result
     self.playerController = SyncedPlayerController(result: result)
     self.projectName = result.screenVideoURL.deletingPathExtension().lastPathComponent
+    self.cameraAspect = ConfigService.shared.cameraAspect
   }
 
   func setup() async {

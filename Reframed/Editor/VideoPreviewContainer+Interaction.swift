@@ -98,7 +98,7 @@ extension VideoPreviewContainer {
     webcamWrapper.frame = CGRect(x: x, y: bounds.height - y - h, width: w, height: h)
     if currentCameraShadow > 0 {
       let minDim = min(w, h)
-      let scaledRadius = minDim * (currentCameraCornerRadius / 100.0)
+      let scaledRadius = currentCameraAspect.cornerRadius(in: webcamWrapper.frame, percentage: currentCameraCornerRadius)
       let camBlur = minDim * currentCameraShadow / 2000.0
       webcamWrapper.layer?.shadowRadius = camBlur
       webcamWrapper.layer?.shadowOpacity = 0.6

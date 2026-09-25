@@ -21,7 +21,7 @@ extension SessionState {
     cameraPreviewState = .starting
 
     let previewWindow = WebcamPreviewWindow()
-    previewWindow.showLoading()
+    previewWindow.showLoading(cameraAspect: options.cameraAspect)
     webcamPreviewWindow = previewWindow
 
     Task {
@@ -43,7 +43,11 @@ extension SessionState {
         cameraPreviewState = .previewing
 
         if let session = webcam.captureSession {
-          previewWindow.show(captureSession: session)
+          previewWindow.show(
+            captureSession: session,
+            cameraAspect: options.cameraAspect,
+            webcamSize: CGSize(width: info.width, height: info.height)
+          )
         }
         logger.info("Camera preview started: \(info.width)x\(info.height)")
       } catch {
@@ -75,11 +79,22 @@ extension SessionState {
   func showCameraPreviewIfNeeded(from box: SendableBox<AVCaptureSession>?) {
     if let camSession = box?.session {
       let previewWindow = WebcamPreviewWindow()
-      previewWindow.show(captureSession: camSession)
+      previewWindow.show(
+        captureSession: camSession,
+        cameraAspect: options.cameraAspect,
+        webcamSize: verifiedCameraInfo.map { CGSize(width: $0.width, height: $0.height) }
+      )
       if options.hideCameraPreviewWhileRecording {
         previewWindow.hide()
       }
       self.webcamPreviewWindow = previewWindow
     }
+  }
+
+  func updateCameraPreviewShape() {
+    webcamPreviewWindow?.updateStyle(
+      cameraAspect: options.cameraAspect,
+      webcamSize: verifiedCameraInfo.map { CGSize(width: $0.width, height: $0.height) }
+    )
   }
 }

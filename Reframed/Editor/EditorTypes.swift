@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 enum CanvasAspect: String, Codable, Sendable, CaseIterable, Identifiable {
@@ -35,9 +36,18 @@ enum CameraAspect: String, Codable, Sendable, CaseIterable, Identifiable {
   case ratio16x9
   case ratio1x1
   case ratio4x3
+  case ratio3x2
+  case ratio2x3
   case ratio9x16
+  case circle
 
   var id: String { rawValue }
+
+  static let pickerRows: [[CameraAspect]] = [
+    [.original, .circle],
+    [.ratio16x9, .ratio1x1, .ratio4x3],
+    [.ratio3x2, .ratio2x3, .ratio9x16],
+  ]
 
   var label: String {
     switch self {
@@ -45,8 +55,15 @@ enum CameraAspect: String, Codable, Sendable, CaseIterable, Identifiable {
     case .ratio16x9: "16:9"
     case .ratio1x1: "1:1"
     case .ratio4x3: "4:3"
+    case .ratio3x2: "3:2"
+    case .ratio2x3: "2:3"
     case .ratio9x16: "9:16"
+    case .circle: "Circle"
     }
+  }
+
+  var isCircle: Bool {
+    self == .circle
   }
 
   func heightToWidthRatio(webcamSize: CGSize) -> CGFloat {
@@ -55,8 +72,16 @@ enum CameraAspect: String, Codable, Sendable, CaseIterable, Identifiable {
     case .ratio16x9: 9.0 / 16.0
     case .ratio1x1: 1.0
     case .ratio4x3: 3.0 / 4.0
+    case .ratio3x2: 2.0 / 3.0
+    case .ratio2x3: 3.0 / 2.0
     case .ratio9x16: 16.0 / 9.0
+    case .circle: 1.0
     }
+  }
+
+  func cornerRadius(in rect: CGRect, percentage: CGFloat) -> CGFloat {
+    let minDimension = min(rect.width, rect.height)
+    return minDimension * ((isCircle ? 50 : percentage) / 100.0)
   }
 }
 

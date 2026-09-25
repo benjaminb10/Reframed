@@ -88,6 +88,10 @@ final class RecordingOptions {
     didSet { ConfigService.shared.showRecordingPreview = showRecordingPreview }
   }
 
+  var cameraAspect: CameraAspect {
+    didSet { ConfigService.shared.cameraAspect = cameraAspect }
+  }
+
   var hdrCapture: Bool {
     didSet { ConfigService.shared.hdrCapture = hdrCapture }
   }
@@ -127,6 +131,7 @@ final class RecordingOptions {
     dimOuterArea = config.dimOuterArea
     hideCameraPreviewWhileRecording = config.hideCameraPreviewWhileRecording
     showRecordingPreview = config.showRecordingPreview
+    cameraAspect = config.cameraAspect
     hdrCapture = config.hdrCapture
 
     let savedDeviceId = config.audioDeviceId
