@@ -102,7 +102,7 @@ final class RecordingOptions {
 
   var availableCameras: [CaptureDevice] {
     let discovery = AVCaptureDevice.DiscoverySession(
-      deviceTypes: [.builtInWideAngleCamera, .external],
+      deviceTypes: WebcamCapture.deviceTypes,
       mediaType: .video,
       position: .unspecified
     )
@@ -150,7 +150,7 @@ final class RecordingOptions {
 
     if let cameraId = config.cameraDeviceId {
       let discovery = AVCaptureDevice.DiscoverySession(
-        deviceTypes: [.builtInWideAngleCamera, .external],
+        deviceTypes: WebcamCapture.deviceTypes,
         mediaType: .video,
         position: .unspecified
       )

@@ -35,7 +35,7 @@ struct SettingsView: View {
 
   var availableCameras: [CaptureDevice] {
     let discovery = AVCaptureDevice.DiscoverySession(
-      deviceTypes: [.builtInWideAngleCamera, .external],
+      deviceTypes: WebcamCapture.deviceTypes,
       mediaType: .video,
       position: .unspecified
     )

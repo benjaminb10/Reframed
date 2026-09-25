@@ -10,6 +10,8 @@ struct VerifiedCamera: Sendable {
 }
 
 final class WebcamCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, @unchecked Sendable {
+  static let deviceTypes: [AVCaptureDevice.DeviceType] = [.builtInWideAngleCamera, .external, .continuityCamera]
+
   private(set) var captureSession: AVCaptureSession?
   private var videoWriter: VideoTrackWriter?
   private let logger = Logger(label: "eu.jankuri.reframed.webcam-capture")
@@ -36,7 +38,7 @@ final class WebcamCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
     }
 
     let discovery = AVCaptureDevice.DiscoverySession(
-      deviceTypes: [.builtInWideAngleCamera, .external],
+      deviceTypes: Self.deviceTypes,
       mediaType: .video,
       position: .unspecified
     )
