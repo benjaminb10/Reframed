@@ -23,6 +23,18 @@ extension EditorState {
     }
   }
 
+  func applyLiveCameraDefaults() {
+    guard result.webcamSize != nil else { return }
+    let config = ConfigService.shared
+    if !cameraAspect.isCircle {
+      cameraCornerRadius = config.liveCameraCornerRadius
+    }
+    if config.liveCameraRelativeWidth > 0 {
+      cameraLayout.relativeWidth = min(max(config.liveCameraRelativeWidth, 0.05), maxCameraRelativeWidth)
+    }
+    setCameraCorner(config.liveCameraCorner)
+  }
+
   func clampCameraPosition() {
     cameraLayout.relativeWidth = min(cameraLayout.relativeWidth, maxCameraRelativeWidth)
     let relH = cameraRelativeHeight

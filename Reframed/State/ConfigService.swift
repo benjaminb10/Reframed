@@ -85,6 +85,41 @@ final class ConfigService {
     set { data.mirrorCamera = newValue; save() }
   }
 
+  var liveCameraWidth: CGFloat {
+    get { data.liveCameraWidth }
+    set { data.liveCameraWidth = newValue; save() }
+  }
+
+  var liveCameraCornerRadius: CGFloat {
+    get { data.liveCameraCornerRadius }
+    set { data.liveCameraCornerRadius = newValue; save() }
+  }
+
+  var liveCameraRelativeWidth: CGFloat {
+    get { data.liveCameraRelativeWidth }
+    set { data.liveCameraRelativeWidth = newValue; save() }
+  }
+
+  var liveCameraCorner: CameraCorner {
+    get {
+      switch data.liveCameraCorner {
+      case "topLeft": .topLeft
+      case "topRight": .topRight
+      case "bottomLeft": .bottomLeft
+      default: .bottomRight
+      }
+    }
+    set {
+      switch newValue {
+      case .topLeft: data.liveCameraCorner = "topLeft"
+      case .topRight: data.liveCameraCorner = "topRight"
+      case .bottomLeft: data.liveCameraCorner = "bottomLeft"
+      case .bottomRight: data.liveCameraCorner = "bottomRight"
+      }
+      save()
+    }
+  }
+
   var showRecordingPreview: Bool {
     get { data.showRecordingPreview }
     set { data.showRecordingPreview = newValue; save() }
@@ -190,6 +225,10 @@ private struct ConfigData: Codable {
   var dimOuterArea: Bool = true
   var hideCameraPreviewWhileRecording: Bool = false
   var mirrorCamera: Bool = true
+  var liveCameraWidth: CGFloat = 270
+  var liveCameraCornerRadius: CGFloat = 30
+  var liveCameraRelativeWidth: CGFloat = 0
+  var liveCameraCorner: String = "bottomRight"
   var showRecordingPreview: Bool = false
   var hdrCapture: Bool = false
   var isMicrophoneOn: Bool = false

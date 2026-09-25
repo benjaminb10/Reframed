@@ -249,6 +249,7 @@ final class EditorState {
     self.projectName = result.screenVideoURL.deletingPathExtension().lastPathComponent
     self.cameraAspect = ConfigService.shared.cameraAspect
     self.cameraMirrored = ConfigService.shared.mirrorCamera
+    applyLiveCameraDefaults()
   }
 
   func setup() async {

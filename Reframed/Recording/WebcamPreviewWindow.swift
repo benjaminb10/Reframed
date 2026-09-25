@@ -10,8 +10,9 @@ final class WebcamPreviewWindow {
   nonisolated(unsafe) private var moveObserver: NSObjectProtocol?
   private var appearanceObserver: NSKeyValueObservation?
 
-  private let baseVideoWidth: CGFloat = 270
-  private let cornerRadiusPercent: CGFloat = 30
+  private var cornerRadiusPercent: CGFloat = ConfigService.shared.liveCameraCornerRadius
+  private let interactionView = WebcamPreviewInteractionView()
+  private var editStartFrame: NSRect = .zero
   private var videoWidth: CGFloat = 270
   private var videoHeight: CGFloat = 202
   private var cameraAspect: CameraAspect = .original
@@ -23,6 +24,66 @@ final class WebcamPreviewWindow {
       return cameraAspect.cornerRadius(in: rect, percentage: 50)
     }
     return min(videoWidth, videoHeight) * cornerRadiusPercent / 100
+  }
+
+  private func installInteractionView() {
+    guard let contentView = panel?.contentView else { return }
+    interactionView.frame = contentView.bounds
+    interactionView.autoresizingMask = [.width, .height]
+    interactionView.cornerRadius = cornerRadius
+    interactionView.allowsRadius = !cameraAspect.isCircle
+    interactionView.onBeginEdit = { [weak self] in
+      self?.editStartFrame = self?.panel?.frame ?? .zero
+    }
+    interactionView.onResize = { [weak self] corner, mouse in
+      self?.resize(from: corner, to: mouse)
+    }
+    interactionView.onRadius = { [weak self] percentage in
+      self?.cornerRadiusPercent = percentage
+      self?.relayoutContent()
+    }
+    interactionView.onEndEdit = { [weak self] in
+      self?.persistLiveLayout()
+    }
+    interactionView.removeFromSuperview()
+    contentView.addSubview(interactionView)
+  }
+
+  private func resize(from corner: CameraHandleCorner, to mouse: NSPoint) {
+    guard let panel else { return }
+    let start = editStartFrame
+    let anchorX = corner.isLeft ? start.maxX : start.minX
+    let anchorY = corner.isTop ? start.minY : start.maxY
+    let ratio = videoHeight / max(videoWidth, 1)
+    let screenWidth = (panel.screen ?? NSScreen.main)?.visibleFrame.width ?? 1440
+    let wanted = max(abs(mouse.x - anchorX), abs(mouse.y - anchorY) / max(ratio, 0.01))
+    let width = round(min(max(wanted, 120), screenWidth * 0.6))
+    let height = round(width * ratio)
+    videoWidth = width
+    videoHeight = height
+    let origin = NSPoint(x: corner.isLeft ? anchorX - width : anchorX, y: corner.isTop ? anchorY : anchorY - height)
+    panel.setFrame(NSRect(origin: origin, size: NSSize(width: width, height: height)), display: true)
+    relayoutContent()
+  }
+
+  private func relayoutContent() {
+    guard let panel, let contentView = panel.contentView else { return }
+    contentView.frame = NSRect(origin: .zero, size: panel.frame.size)
+    for subview in contentView.subviews where subview !== interactionView {
+      subview.frame = contentView.bounds
+      subview.layer?.cornerRadius = cornerRadius
+    }
+    previewLayer?.frame = contentView.bounds
+    interactionView.frame = contentView.bounds
+    interactionView.cornerRadius = cornerRadius
+    interactionView.allowsRadius = !cameraAspect.isCircle
+    panel.invalidateShadow()
+  }
+
+  private func persistLiveLayout() {
+    ConfigService.shared.liveCameraWidth = videoWidth
+    ConfigService.shared.liveCameraCornerRadius = cornerRadiusPercent
+    savePosition()
   }
 
   private var totalWidth: CGFloat { videoWidth }
@@ -66,6 +127,7 @@ final class WebcamPreviewWindow {
 
     contentView.addSubview(container)
     loadingView = container
+    installInteractionView()
 
     panel?.orderFrontRegardless()
   }
@@ -106,6 +168,7 @@ final class WebcamPreviewWindow {
     applyMirror(to: layer)
 
     contentView.addSubview(videoView, positioned: .below, relativeTo: loadingView)
+    installInteractionView()
     panel?.orderFrontRegardless()
 
     let pendingLoadingView = loadingView
@@ -153,6 +216,7 @@ final class WebcamPreviewWindow {
 
     contentView.addSubview(container)
     loadingView = container
+    installInteractionView()
 
     panel?.orderFrontRegardless()
   }
@@ -218,8 +282,7 @@ final class WebcamPreviewWindow {
 
     let contentView = NSView(frame: NSRect(origin: .zero, size: NSSize(width: totalWidth, height: totalHeight)))
     contentView.wantsLayer = true
-    contentView.layer?.cornerRadius = cornerRadius
-    contentView.layer?.masksToBounds = true
+    contentView.layer?.masksToBounds = false
     contentView.layer?.backgroundColor = NSColor.clear.cgColor
 
     panel.contentView = contentView
@@ -250,7 +313,7 @@ final class WebcamPreviewWindow {
 
     let sourceSize = self.webcamSize ?? CGSize(width: 4, height: 3)
     let ratio = cameraAspect.heightToWidthRatio(webcamSize: sourceSize)
-    videoWidth = baseVideoWidth
+    videoWidth = ConfigService.shared.liveCameraWidth
     videoHeight = round(videoWidth * ratio)
   }
 
@@ -261,16 +324,7 @@ final class WebcamPreviewWindow {
     let origin = CGPoint(x: oldFrame.maxX - newSize.width, y: oldFrame.origin.y)
     panel.setFrame(NSRect(origin: origin, size: newSize), display: true)
 
-    guard let contentView = panel.contentView else { return }
-    contentView.frame = NSRect(origin: .zero, size: newSize)
-    contentView.layer?.cornerRadius = cornerRadius
-
-    for subview in contentView.subviews {
-      subview.frame = contentView.bounds
-      subview.layer?.cornerRadius = cornerRadius
-    }
-
-    previewLayer?.frame = contentView.bounds
+    relayoutContent()
   }
 
   private func updateColors() {
@@ -310,7 +364,16 @@ final class WebcamPreviewWindow {
   }
 
   private func savePosition() {
-    guard let frame = panel?.frame else { return }
+    guard let panel else { return }
+    let frame = panel.frame
     StateService.shared.webcamPreviewPosition = frame.origin
+    if let screen = panel.screen ?? NSScreen.main {
+      let screenFrame = screen.frame
+      ConfigService.shared.liveCameraRelativeWidth = frame.width / max(screenFrame.width, 1)
+      let isRight = frame.midX > screenFrame.midX
+      let isTop = frame.midY > screenFrame.midY
+      ConfigService.shared.liveCameraCorner =
+        isTop ? (isRight ? .topRight : .topLeft) : (isRight ? .bottomRight : .bottomLeft)
+    }
   }
 }
