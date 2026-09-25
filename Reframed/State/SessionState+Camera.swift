@@ -92,6 +92,7 @@ extension SessionState {
   }
 
   func updateCameraPreviewShape() {
+    webcamPreviewWindow?.setMirrored(options.mirrorCamera)
     webcamPreviewWindow?.updateStyle(
       cameraAspect: options.cameraAspect,
       webcamSize: verifiedCameraInfo.map { CGSize(width: $0.width, height: $0.height) }

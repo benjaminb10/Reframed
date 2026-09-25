@@ -248,6 +248,7 @@ final class EditorState {
     self.playerController = SyncedPlayerController(result: result)
     self.projectName = result.screenVideoURL.deletingPathExtension().lastPathComponent
     self.cameraAspect = ConfigService.shared.cameraAspect
+    self.cameraMirrored = ConfigService.shared.mirrorCamera
   }
 
   func setup() async {

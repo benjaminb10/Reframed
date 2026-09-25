@@ -80,6 +80,11 @@ final class ConfigService {
     set { data.hideCameraPreviewWhileRecording = newValue; save() }
   }
 
+  var mirrorCamera: Bool {
+    get { data.mirrorCamera }
+    set { data.mirrorCamera = newValue; save() }
+  }
+
   var showRecordingPreview: Bool {
     get { data.showRecordingPreview }
     set { data.showRecordingPreview = newValue; save() }
@@ -184,6 +189,7 @@ private struct ConfigData: Codable {
   var retinaCapture: Bool = false
   var dimOuterArea: Bool = true
   var hideCameraPreviewWhileRecording: Bool = false
+  var mirrorCamera: Bool = true
   var showRecordingPreview: Bool = false
   var hdrCapture: Bool = false
   var isMicrophoneOn: Bool = false

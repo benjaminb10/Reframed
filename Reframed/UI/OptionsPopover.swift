@@ -2,7 +2,7 @@ import SwiftUI
 
 struct OptionsPopover: View {
   @Bindable var options: RecordingOptions
-  var onCameraAspectChange: (() -> Void)?
+  var onCameraPreviewChange: (() -> Void)?
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
@@ -124,6 +124,13 @@ struct OptionsPopover: View {
       }
 
       CheckmarkRow(
+        title: "Mirror Camera",
+        isSelected: options.mirrorCamera
+      ) {
+        options.mirrorCamera.toggle()
+      }
+
+      CheckmarkRow(
         title: "Show Recording Preview",
         isSelected: options.showRecordingPreview
       ) {
@@ -148,7 +155,10 @@ struct OptionsPopover: View {
     .frame(minWidth: 280)
     .popoverContainerStyle()
     .onChange(of: options.cameraAspect) { _, _ in
-      onCameraAspectChange?()
+      onCameraPreviewChange?()
+    }
+    .onChange(of: options.mirrorCamera) { _, _ in
+      onCameraPreviewChange?()
     }
   }
 }

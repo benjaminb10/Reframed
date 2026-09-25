@@ -84,6 +84,10 @@ final class RecordingOptions {
     didSet { ConfigService.shared.hideCameraPreviewWhileRecording = hideCameraPreviewWhileRecording }
   }
 
+  var mirrorCamera: Bool {
+    didSet { ConfigService.shared.mirrorCamera = mirrorCamera }
+  }
+
   var showRecordingPreview: Bool {
     didSet { ConfigService.shared.showRecordingPreview = showRecordingPreview }
   }
@@ -130,6 +134,7 @@ final class RecordingOptions {
     retinaCapture = config.retinaCapture
     dimOuterArea = config.dimOuterArea
     hideCameraPreviewWhileRecording = config.hideCameraPreviewWhileRecording
+    mirrorCamera = config.mirrorCamera
     showRecordingPreview = config.showRecordingPreview
     cameraAspect = config.cameraAspect
     hdrCapture = config.hdrCapture

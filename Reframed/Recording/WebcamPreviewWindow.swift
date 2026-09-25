@@ -5,6 +5,7 @@ import AppKit
 final class WebcamPreviewWindow {
   private var panel: NSPanel?
   private var previewLayer: AVCaptureVideoPreviewLayer?
+  private var isMirrored = ConfigService.shared.mirrorCamera
   private var loadingView: NSView?
   nonisolated(unsafe) private var moveObserver: NSObjectProtocol?
   private var appearanceObserver: NSKeyValueObservation?
@@ -101,6 +102,8 @@ final class WebcamPreviewWindow {
     layer.autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
     videoView.layer?.addSublayer(layer)
     self.previewLayer = layer
+    isMirrored = ConfigService.shared.mirrorCamera
+    applyMirror(to: layer)
 
     contentView.addSubview(videoView, positioned: .below, relativeTo: loadingView)
     panel?.orderFrontRegardless()
@@ -152,6 +155,18 @@ final class WebcamPreviewWindow {
     loadingView = container
 
     panel?.orderFrontRegardless()
+  }
+
+  func setMirrored(_ mirrored: Bool) {
+    isMirrored = mirrored
+    if let previewLayer { applyMirror(to: previewLayer) }
+  }
+
+  private func applyMirror(to layer: AVCaptureVideoPreviewLayer) {
+    CATransaction.begin()
+    CATransaction.setDisableActions(true)
+    layer.setAffineTransform(isMirrored ? CGAffineTransform(scaleX: -1, y: 1) : .identity)
+    CATransaction.commit()
   }
 
   func updateStyle(cameraAspect: CameraAspect, webcamSize: CGSize? = nil) {
