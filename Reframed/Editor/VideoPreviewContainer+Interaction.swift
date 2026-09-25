@@ -4,7 +4,8 @@ import AppKit
 extension VideoPreviewContainer {
   override func hitTest(_ point: NSPoint) -> NSView? {
     let loc = convert(point, from: superview)
-    if !webcamWrapper.isHidden && webcamWrapper.frame.contains(loc) {
+    let margin = Self.cameraHoverMargin
+    if !webcamWrapper.isHidden && webcamWrapper.frame.insetBy(dx: -margin, dy: -margin).contains(loc) {
       return self
     }
     return super.hitTest(point)
@@ -30,20 +31,37 @@ extension VideoPreviewContainer {
       return
     }
     let loc = convert(event.locationInWindow, from: nil)
-    if webcamWrapper.frame.contains(loc) {
-      NSCursor.openHand.set()
-    } else {
-      NSCursor.arrow.set()
+    let margin = Self.cameraHoverMargin
+    let hovering = webcamWrapper.frame.insetBy(dx: -margin, dy: -margin).contains(loc)
+    if hovering != isHoveringCamera {
+      isHoveringCamera = hovering
+      layoutCameraHandles()
     }
+    updateCameraCursor(at: loc)
   }
 
   override func mouseExited(with event: NSEvent) {
+    isHoveringCamera = false
+    layoutCameraHandles()
     NSCursor.arrow.set()
   }
 
   override func mouseDown(with event: NSEvent) {
     guard let coord = coordinator else { return super.mouseDown(with: event) }
     let loc = convert(event.locationInWindow, from: nil)
+
+    switch cameraDragMode(at: loc) {
+    case .radius:
+      activeCameraDrag = .radius
+      coord.startLayout = coord.cameraLayout.wrappedValue
+      return
+    case .resize(let corner):
+      activeCameraDrag = .resize(corner)
+      coord.startLayout = coord.cameraLayout.wrappedValue
+      return
+    case .move, .none:
+      break
+    }
 
     if webcamWrapper.frame.contains(loc) && !webcamWrapper.isHidden {
       coord.isDragging = true
@@ -56,6 +74,16 @@ extension VideoPreviewContainer {
   }
 
   override func mouseDragged(with event: NSEvent) {
+    switch activeCameraDrag {
+    case .resize(let corner):
+      dragCameraResize(corner, to: convert(event.locationInWindow, from: nil))
+      return
+    case .radius:
+      dragCameraRadius(to: convert(event.locationInWindow, from: nil))
+      return
+    case .move, .none:
+      break
+    }
     guard let coord = coordinator, coord.isDragging else {
       return super.mouseDragged(with: event)
     }
@@ -113,6 +141,13 @@ extension VideoPreviewContainer {
   }
 
   override func mouseUp(with event: NSEvent) {
+    if activeCameraDrag != .none {
+      activeCameraDrag = .none
+      layoutAll()
+      layoutCameraHandles()
+      updateCameraCursor(at: convert(event.locationInWindow, from: nil))
+      return
+    }
     let wasDragging = coordinator?.isDragging == true
     coordinator?.isDragging = false
     isDraggingCamera = false

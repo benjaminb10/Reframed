@@ -4,6 +4,8 @@ import SwiftUI
 extension VideoPreviewView {
   final class Coordinator {
     var cameraLayout: Binding<CameraLayout>
+    var cameraCornerRadius: Binding<CGFloat>?
+    var maxCameraRelativeWidth: CGFloat = 1
     let screenSize: CGSize
     var canvasSize: CGSize
     let webcamSize: CGSize?

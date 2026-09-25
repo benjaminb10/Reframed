@@ -20,6 +20,9 @@ final class VideoPreviewContainer: NSView {
   var screenTransitionType: RegionTransitionType = .none
   var isScreenHidden = false
   var isDraggingCamera = false
+  let cameraHandlesLayer = CALayer()
+  var isHoveringCamera = false
+  var activeCameraDrag: CameraDragMode = .none
   var currentLayout = CameraLayout()
   var currentWebcamSize: CGSize?
   var currentScreenSize: CGSize = .zero

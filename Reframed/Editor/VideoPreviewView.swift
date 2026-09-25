@@ -80,6 +80,8 @@ struct VideoPreviewView: NSViewRepresentable {
   var cameraBackgroundStyle: CameraBackgroundStyle = .none
   var cameraBackgroundImage: NSImage?
   var isHDR: Bool = false
+  var cameraCornerRadiusBinding: Binding<CGFloat>?
+  var maxCameraRelativeWidth: CGFloat = 1
 
   func makeNSView(context: Context) -> VideoPreviewContainer {
     let container = VideoPreviewContainer()
@@ -105,6 +107,8 @@ struct VideoPreviewView: NSViewRepresentable {
   func updateNSView(_ nsView: VideoPreviewContainer, context: Context) {
     context.coordinator.cameraLayout = $cameraLayout
     context.coordinator.canvasSize = canvasSize
+    context.coordinator.cameraCornerRadius = cameraCornerRadiusBinding
+    context.coordinator.maxCameraRelativeWidth = maxCameraRelativeWidth
 
     if let webcam = webcamPlayer {
       if nsView.webcamPlayerLayer.player !== webcam {
@@ -123,6 +127,7 @@ struct VideoPreviewView: NSViewRepresentable {
     updateZoom(nsView)
     updateOverlays(nsView)
     updateClickSound(context.coordinator)
+    nsView.layoutCameraHandles()
   }
 
   func makeCoordinator() -> Coordinator {

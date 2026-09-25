@@ -134,7 +134,9 @@ extension EditorView {
           ).edgeSoftness,
           cameraBackgroundStyle: editorState.webcamEnabled ? editorState.cameraBackgroundStyle : .none,
           cameraBackgroundImage: editorState.cameraBackgroundImage,
-          isHDR: editorState.result.isHDR
+          isHDR: editorState.result.isHDR,
+          cameraCornerRadiusBinding: $editorState.cameraCornerRadius,
+          maxCameraRelativeWidth: editorState.maxCameraRelativeWidth
         )
 
         if let captionText = editorState.visibleCaptionText(

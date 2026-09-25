@@ -42,6 +42,7 @@
 		77FF6F9C84DFEC39E9C89E80 /* VideoPreviewView+Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 028393B5A95F5605BC666DB9 /* VideoPreviewView+Coordinator.swift */; };
 		7BD986F817440D7EA5E3F22C /* VideoPreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34448E948FE88A1C6C011585 /* VideoPreviewContainer.swift */; };
 		7C1A78C769C856DC34BD3318 /* VideoPreviewContainer+Interaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3469C70747A78B7BDD2B5C /* VideoPreviewContainer+Interaction.swift */; };
+		5F453533568E4FD949D4DDEB /* VideoPreviewContainer+CameraHandles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35BD68FDE6960534CDFCDC96 /* VideoPreviewContainer+CameraHandles.swift */; };
 		828909551C8795EF72269706 /* PropertiesPanel+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C03E11186EDDA74B1B6958 /* PropertiesPanel+Background.swift */; };
 		86BD45F487E80051EC653B68 /* CursorRenderer+Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC84C35E4DD49FCEA9DE6CBB /* CursorRenderer+Shapes.swift */; };
 		922F814E886E4D2B242E4541 /* VideoPreviewContainer+Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17A303B9C60827322EAE0A9 /* VideoPreviewContainer+Cursor.swift */; };
@@ -281,6 +282,7 @@
 		496D11968908B4B678987F2F /* FrameRenderer+Webcam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FrameRenderer+Webcam.swift"; sourceTree = "<group>"; };
 		55C3A4D8ED8A124F0232C7E9 /* CmdScrollZoomOverlay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CmdScrollZoomOverlay.swift; sourceTree = "<group>"; };
 		5F3469C70747A78B7BDD2B5C /* VideoPreviewContainer+Interaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+Interaction.swift"; sourceTree = "<group>"; };
+		35BD68FDE6960534CDFCDC96 /* VideoPreviewContainer+CameraHandles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPreviewContainer+CameraHandles.swift"; sourceTree = "<group>"; };
 		606EC18A425D1DD59552E55E /* SessionState+UI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "SessionState+UI.swift"; sourceTree = "<group>"; };
 		6B4535D89EAC6F65D82BC248 /* CaptureToolbar+Controls.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CaptureToolbar+Controls.swift"; sourceTree = "<group>"; };
 		6BE6D512A7F588ED67F16A77 /* SessionState+WindowInfo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "SessionState+WindowInfo.swift"; sourceTree = "<group>"; };
@@ -845,6 +847,7 @@
 				C15A771AADEFDA0C088C4DB9 /* VideoPreviewContainer+Layout.swift */,
 				B17A303B9C60827322EAE0A9 /* VideoPreviewContainer+Cursor.swift */,
 				5F3469C70747A78B7BDD2B5C /* VideoPreviewContainer+Interaction.swift */,
+				35BD68FDE6960534CDFCDC96 /* VideoPreviewContainer+CameraHandles.swift */,
 				BC84C35E4DD49FCEA9DE6CBB /* CursorRenderer+Shapes.swift */,
 				CA20000000000000000000A4 /* EditorState+Captions.swift */,
 				CA20000000000000000000A5 /* PropertiesPanel+CaptionsTab.swift */,
@@ -1201,6 +1204,7 @@
 				3544226AADD3C55BCF2369B3 /* VideoPreviewContainer+Layout.swift in Sources */,
 				922F814E886E4D2B242E4541 /* VideoPreviewContainer+Cursor.swift in Sources */,
 				7C1A78C769C856DC34BD3318 /* VideoPreviewContainer+Interaction.swift in Sources */,
+				5F453533568E4FD949D4DDEB /* VideoPreviewContainer+CameraHandles.swift in Sources */,
 				86BD45F487E80051EC653B68 /* CursorRenderer+Shapes.swift in Sources */,
 				478BDD1EF7481A01B5699D29 /* FrameRenderer+Background.swift in Sources */,
 				BBEB3400455A8A36A0585D21 /* FrameRenderer+Screen.swift in Sources */,
