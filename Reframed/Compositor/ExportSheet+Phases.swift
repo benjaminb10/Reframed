@@ -130,11 +130,11 @@ extension ExportSheet {
     }
   }
 
-  func startExport() {
+  func startExport(forPalmier: Bool = false) {
     phase = .exporting
     exportTask = Task {
       do {
-        let url = try await editorState.export(settings: settings)
+        let url = try await editorState.export(settings: settings, forPalmier: forPalmier)
         try Task.checkCancellation()
         editorState.lastExportedURL = url
         phase = .completed

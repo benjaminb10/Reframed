@@ -210,6 +210,15 @@ struct ExportSheet: View {
           }
           .buttonStyle(OutlineButtonStyle(size: .small))
 
+          Button("Export for Palmier") {
+            startExport(forPalmier: true)
+          }
+          .buttonStyle(OutlineButtonStyle(size: .small))
+          .disabled(settings.format.isGIF)
+          .help(
+            "Exports the styled screen without the webcam, uncut, plus the raw webcam and microphone, in one folder ready to import into Palmier"
+          )
+
           Button("Export") {
             startExport()
           }

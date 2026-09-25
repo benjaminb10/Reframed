@@ -3,7 +3,7 @@ import CoreMedia
 import Foundation
 
 extension EditorState {
-  func export(settings: ExportSettings) async throws -> URL {
+  func export(settings: ExportSettings, forPalmier: Bool = false) async throws -> URL {
     isExporting = true
     exportProgress = 0
     exportETA = nil
@@ -38,18 +38,24 @@ extension EditorState {
       )
     }
 
-    let sysRegions = systemAudioRegions.map {
-      CMTimeRange(
-        start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
-        end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
-      )
-    }
-    let micRegions = micAudioRegions.map {
-      CMTimeRange(
-        start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
-        end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
-      )
-    }
+    let sysRegions =
+      forPalmier
+      ? []
+      : systemAudioRegions.map {
+        CMTimeRange(
+          start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
+          end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
+        )
+      }
+    let micRegions =
+      forPalmier
+      ? []
+      : micAudioRegions.map {
+        CMTimeRange(
+          start: CMTime(seconds: $0.startSeconds, preferredTimescale: 600),
+          end: CMTime(seconds: $0.endSeconds, preferredTimescale: 600)
+        )
+      }
     let camFsRegions = cameraRegions.filter { $0.type == .fullscreen }.map {
       RegionTransitionInfo(
         timeRange: CMTimeRange(
@@ -123,7 +129,7 @@ extension EditorState {
       }
 
     let exportResult: RecordingResult
-    if webcamEnabled {
+    if webcamEnabled && !forPalmier {
       exportResult = result
     } else {
       exportResult = RecordingResult(
@@ -143,15 +149,17 @@ extension EditorState {
     let exportConfig = ExportConfiguration(
       cameraLayout: cameraLayout,
       cameraAspect: cameraAspect,
-      trimRange: vidRegions.isEmpty
-        ? CMTimeRange(start: trimStart, end: trimEnd)
-        : CMTimeRange(start: .zero, end: duration),
+      trimRange: forPalmier
+        ? CMTimeRange(start: .zero, end: duration)
+        : vidRegions.isEmpty
+          ? CMTimeRange(start: trimStart, end: trimEnd)
+          : CMTimeRange(start: .zero, end: duration),
       systemAudioRegions: sysRegions.isEmpty ? nil : sysRegions,
       micAudioRegions: micRegions.isEmpty ? nil : micRegions,
-      cameraFullscreenRegions: camFsRegions.isEmpty ? nil : camFsRegions,
-      cameraHiddenRegions: camHiddenRegions.isEmpty ? nil : camHiddenRegions,
-      cameraCustomRegions: camCustomRegions.isEmpty ? nil : camCustomRegions,
-      videoRegions: vidRegions.isEmpty ? nil : vidRegions,
+      cameraFullscreenRegions: camFsRegions.isEmpty || forPalmier ? nil : camFsRegions,
+      cameraHiddenRegions: camHiddenRegions.isEmpty || forPalmier ? nil : camHiddenRegions,
+      cameraCustomRegions: camCustomRegions.isEmpty || forPalmier ? nil : camCustomRegions,
+      videoRegions: vidRegions.isEmpty || forPalmier ? nil : vidRegions,
       backgroundStyle: backgroundStyle,
       backgroundImageURL: backgroundImageURL(),
       backgroundImageFillMode: backgroundImageFillMode,
@@ -166,7 +174,7 @@ extension EditorState {
       cameraMirrored: cameraMirrored,
       cameraFullscreenFillMode: cameraFullscreenFillMode,
       cameraFullscreenAspect: cameraFullscreenAspect,
-      playbackSpeed: playbackSpeed,
+      playbackSpeed: forPalmier ? 1.0 : playbackSpeed,
       exportSettings: settings,
       cursorSnapshot: cursorSnapshot,
       cursorStyle: cursorStyle,
@@ -189,8 +197,8 @@ extension EditorState {
       cameraBackgroundStyle: cameraBackgroundStyle,
       cameraBackgroundImageURL: cameraBackgroundImageURL(),
       processedMicAudioURL: processedMicAudioURL,
-      captionSegments: settings.burnInCaptions ? captionSegments : [],
-      captionsEnabled: settings.burnInCaptions && captionsEnabled,
+      captionSegments: settings.burnInCaptions && !forPalmier ? captionSegments : [],
+      captionsEnabled: settings.burnInCaptions && captionsEnabled && !forPalmier,
       captionFontSize: captionFontSize,
       captionFontWeight: captionFontWeight,
       captionTextColor: captionTextColor,
@@ -217,6 +225,13 @@ extension EditorState {
         state.exportETA = eta
       }
     )
+    if forPalmier {
+      let folder = try packageForPalmier(screenExport: url)
+      exportProgress = 1.0
+      lastExportedURL = folder
+      logger.info("Palmier export finished: \(folder.path)")
+      return folder
+    }
     if !captionSegments.isEmpty {
       if settings.exportSRT {
         let srtURL = url.deletingPathExtension().appendingPathExtension("srt")
